@@ -5,4 +5,3 @@ void main() {
   // runApp es la función que "enciende" la pantalla y dibuja tu widget principal
   runApp(const MyApp());
 }
-

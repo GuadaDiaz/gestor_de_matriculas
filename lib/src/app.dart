@@ -13,7 +13,6 @@ class MyApp extends StatelessWidget {
         length: 4,
         initialIndex: 0,
         child: Scaffold(
-
           appBar: AppBar(
             backgroundColor: const Color(0xFF0D47A1),
             toolbarHeight: 0,
@@ -33,22 +32,18 @@ class MyApp extends StatelessWidget {
 
           body: TabBarView(
             children: [
-
               // --- PANTALLA 1: PRINCIPAL ---
               Stack(
                 children: [
                   SizedBox(
                     width: double.infinity,
                     height: double.infinity,
-                    child: Image.asset(
-                      'assets/escuela.jpg',
-                      fit: BoxFit.cover,
-                    ),
+                    child: Image.asset('assets/escuela.jpg', fit: BoxFit.cover),
                   ),
                   Container(
                     width: double.infinity,
                     height: double.infinity,
-                    color: Colors.black.withOpacity(0.4),
+                    color: Colors.black.withValues(alpha: 0.4),
                   ),
                   Center(
                     child: const Text(
@@ -80,7 +75,13 @@ class MyApp extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text('Últimas noticias', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+                    const Text(
+                      'Últimas noticias',
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                     const SizedBox(height: 30),
                     // Cambiado de Image.network a Image.asset:
                     Image.asset(
@@ -98,14 +99,23 @@ class MyApp extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text('Calendario Académico', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF0D47A1))),
+                      const Text(
+                        'Calendario Académico',
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF0D47A1),
+                        ),
+                      ),
                       const SizedBox(height: 10),
                       CalendarDatePicker(
                         initialDate: DateTime.now(),
                         firstDate: DateTime(2024),
                         lastDate: DateTime(2030),
                         onDateChanged: (DateTime fechaSeleccionada) {
-                          debugPrint('El usuario tocó la fecha: $fechaSeleccionada');
+                          debugPrint(
+                            'El usuario tocó la fecha: $fechaSeleccionada',
+                          );
                         },
                       ),
                     ],
@@ -121,13 +131,29 @@ class MyApp extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                IconButton(icon: const Icon(Icons.camera_alt, color: Colors.white, size: 30), onPressed: () {}),
-                IconButton(icon: const Icon(Icons.facebook, color: Colors.white, size: 30), onPressed: () {}),
-                IconButton(icon: const Icon(Icons.chat, color: Colors.white, size: 30), onPressed: () {}),
+                IconButton(
+                  icon: const Icon(
+                    Icons.camera_alt,
+                    color: Colors.white,
+                    size: 30,
+                  ),
+                  onPressed: () {},
+                ),
+                IconButton(
+                  icon: const Icon(
+                    Icons.facebook,
+                    color: Colors.white,
+                    size: 30,
+                  ),
+                  onPressed: () {},
+                ),
+                IconButton(
+                  icon: const Icon(Icons.chat, color: Colors.white, size: 30),
+                  onPressed: () {},
+                ),
               ],
             ),
           ),
-
         ),
       ),
     );

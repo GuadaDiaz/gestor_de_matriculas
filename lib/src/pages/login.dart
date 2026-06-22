@@ -85,6 +85,7 @@ class _FormularioLoginState extends State<FormularioLogin> {
               onPressed: () {
                 if (_emailController.text.trim().isEmpty ||
                     _passwordController.text.trim().isEmpty) {
+                  ScaffoldMessenger.of(context).clearSnackBars();
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text('Error: Credenciales incompletas.'),
@@ -95,6 +96,7 @@ class _FormularioLoginState extends State<FormularioLogin> {
 
                 // Validación del estado local antes de procesar la lógica de negocio
                 if (rolElegido == null) {
+                  ScaffoldMessenger.of(context).clearSnackBars();
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text('Por favor, seleccione un rol primero'),

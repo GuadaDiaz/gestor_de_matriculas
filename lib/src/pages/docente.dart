@@ -12,6 +12,10 @@ class PantallaDocente extends StatelessWidget {
         backgroundColor: const Color(0xFF0D47A1),
         foregroundColor: Colors.white,
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => Navigator.pop(context),
+        child: const Icon(Icons.add),
+      ),
       body: Stack(
         children: [
           // Background Layer
@@ -20,7 +24,7 @@ class PantallaDocente extends StatelessWidget {
             height: double.infinity,
             decoration: const BoxDecoration(
               image: DecorationImage(
-                image: AssetImage('assets/fondo_docente.jpg'),
+                image: AssetImage('assets/descarga.jpg'),
                 fit: BoxFit.cover,
                 colorFilter: ColorFilter.mode(
                   Color(0xDD000033),
@@ -35,14 +39,14 @@ class PantallaDocente extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.school, size: 80, color: Color(0xFF0D47A1)),
+                const Icon(Icons.school, size: 80, color: Colors.white),
                 const SizedBox(height: 20),
                 const Text(
                   'Gestión Académica',
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF0D47A1),
+                    color: Colors.white,
                   ),
                 ),
                 const SizedBox(height: 40),
@@ -61,7 +65,6 @@ class PantallaDocente extends StatelessWidget {
                     ),
                   ),
                   onPressed: () {
-                    // Centralized navigation pushing the registration view onto the stack
                     Navigator.pushNamed(context, '/registro');
                   },
                 ),

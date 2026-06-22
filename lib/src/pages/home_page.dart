@@ -4,14 +4,9 @@ import 'package:gestion_de_matriculas/src/widgets/novedades.dart';
 import 'package:gestion_de_matriculas/src/widgets/principal.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class HomePage extends StatefulWidget {
+class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
-  @override
-  State<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(

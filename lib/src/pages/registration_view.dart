@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gestion_de_matriculas/src/Alumno/alumno_model.dart';
+import 'package:gestion_de_matriculas/src/alumno/alumno_model.dart';
 
 class RegistrationView extends StatefulWidget {
   const RegistrationView({super.key});
@@ -10,8 +10,9 @@ class RegistrationView extends StatefulWidget {
 
 class _RegistrationViewState extends State<RegistrationView> {
   final TextEditingController _nombreController = TextEditingController();
+  final TextEditingController _dniController = TextEditingController();
+  final TextEditingController _cursoController = TextEditingController();
 
-  // State for the Dropdown
   final List<String> _cursosDisponibles = [
     '1ro A',
     '2do B',
@@ -21,57 +22,62 @@ class _RegistrationViewState extends State<RegistrationView> {
   ];
   String? _cursoSeleccionado;
 
+  DateTime? _fechaSeleccionada; // Estado local para la fecha
+
   @override
   void dispose() {
     _nombreController.dispose();
+    _dniController.dispose();
     super.dispose();
   }
 
-  // Requirement: AlertDialog to interrupt user flow
+  // Asynchronous interaction with the OS Calendar
+  Future<void> _seleccionarFecha(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now().subtract(
+        const Duration(days: 365 * 6),
+      ), // Start 6 years ago
+      firstDate: DateTime(2000),
+      lastDate: DateTime.now(),
+    );
+    if (picked != null && picked != _fechaSeleccionada) {
+      setState(() {
+        _fechaSeleccionada = picked;
+      });
+    }
+  }
+
   Future<void> _confirmSave() async {
-    if (_nombreController.text.isEmpty || _cursoSeleccionado == null) {
+    // Strict validation
+    if (_nombreController.text.isEmpty ||
+        _dniController.text.isEmpty ||
+        _cursoSeleccionado == null ||
+        _fechaSeleccionada == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Por favor, complete todos los campos.')),
+        const SnackBar(
+          content: Text('Por favor, complete todos los campos obligatorios.'),
+        ),
       );
       return;
     }
 
-    final bool? confirmed = await showDialog<bool>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Confirmar Inscripción'),
-          content: Text('¿Desea registrar a ${_nombreController.text}?'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Cancelar'),
-            ),
-            ElevatedButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              child: const Text('Confirmar'),
-            ),
-          ],
-        );
-      },
+    final nuevoAlumno = Alumno(
+      nombre: _nombreController.text,
+      dni: _dniController.text,
+      curso: _cursoSeleccionado!,
+      fechaNacimiento: _fechaSeleccionada!,
     );
 
-    if (confirmed == true) {
-      if (!mounted) return;
-      final nuevoAlumno = Alumno(
-        nombre: _nombreController.text,
-        curso: _cursoSeleccionado!,
-      );
-      Navigator.pop(context, nuevoAlumno);
-    }
+    Navigator.pop(context, nuevoAlumno);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Nueva Inscripción')),
-      // Requirement: Container structuring with padding
-      body: Container(
+      body: SingleChildScrollView(
+        // Changed to ScrollView to avoid keyboard overflow
         padding: const EdgeInsets.all(24.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -79,31 +85,60 @@ class _RegistrationViewState extends State<RegistrationView> {
             TextField(
               controller: _nombreController,
               decoration: const InputDecoration(
-                labelText: 'Nombre Completo del Alumno',
+                labelText: 'Nombre Completo',
                 border: OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: 20),
 
-            DropdownButtonFormField<String>(
+            // DNI Input
+            TextField(
+              controller: _dniController,
+              keyboardType: TextInputType.number,
               decoration: const InputDecoration(
-                labelText: 'Seleccionar Curso',
+                labelText: 'DNI',
                 border: OutlineInputBorder(),
               ),
-              initialValue: _cursoSeleccionado,
-              items: _cursosDisponibles.map((String curso) {
-                return DropdownMenuItem<String>(
-                  value: curso,
-                  child: Text(curso),
-                );
+            ),
+            const SizedBox(height: 20),
+
+            DropdownMenu<String>(
+              controller: _cursoController,
+              label: const Text('Seleccionar Curso'),
+              width: MediaQuery.of(context).size.width - 48,
+              dropdownMenuEntries: _cursosDisponibles.map((String curso) {
+                return DropdownMenuEntry<String>(value: curso, label: curso);
               }).toList(),
-              onChanged: (String? newValue) {
+              onSelected: (String? newValue) {
                 setState(() {
                   _cursoSeleccionado = newValue;
                 });
               },
             ),
-            const Spacer(),
+            const SizedBox(height: 20),
+
+            // DatePicker
+            InkWell(
+              onTap: () => _seleccionarFecha(context),
+              child: InputDecorator(
+                decoration: const InputDecoration(
+                  labelText: 'Fecha de Nacimiento',
+                  border: OutlineInputBorder(),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      _fechaSeleccionada == null
+                          ? 'Seleccione una fecha'
+                          : "${_fechaSeleccionada!.day}/${_fechaSeleccionada!.month}/${_fechaSeleccionada!.year}",
+                    ),
+                    const Icon(Icons.calendar_today),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 40),
 
             ElevatedButton(
               style: ElevatedButton.styleFrom(

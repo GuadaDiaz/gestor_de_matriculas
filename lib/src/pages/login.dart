@@ -12,6 +12,9 @@ class FormularioLogin extends StatefulWidget {
 class _FormularioLoginState extends State<FormularioLogin> {
   String? rolElegido;
 
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -79,6 +82,16 @@ class _FormularioLoginState extends State<FormularioLogin> {
                 ),
               ),
               onPressed: () {
+                if (_emailController.text.trim().isEmpty ||
+                    _passwordController.text.trim().isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Error: Credenciales incompletas.'),
+                    ),
+                  );
+                  return; // Early return, corta la ejecución
+                }
+
                 // Validación del estado local antes de procesar la lógica de negocio
                 if (rolElegido == null) {
                   ScaffoldMessenger.of(context).showSnackBar(

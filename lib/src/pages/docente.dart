@@ -8,13 +8,19 @@ class PantallaDocente extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Perfil Docente'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            tooltip: 'Cerrar Sesión',
+            onPressed: () {
+              // Esto destruye el stack actual y te devuelve al inicio
+              Navigator.pushReplacementNamed(context, '/');
+            },
+          ),
+        ],
         centerTitle: true,
         backgroundColor: const Color(0xFF0D47A1),
         foregroundColor: Colors.white,
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => Navigator.pop(context),
-        child: const Icon(Icons.add),
       ),
       body: Stack(
         children: [

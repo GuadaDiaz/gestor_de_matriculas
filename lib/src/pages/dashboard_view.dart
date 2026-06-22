@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:gestion_de_matriculas/src/alumno/alumno_model.dart';
 import 'package:gestion_de_matriculas/src/widgets/alumno_card.dart';
-import 'dart:convert'; // Tu nuevo componente separado
+import 'dart:convert';
+// Tu nuevo componente separado
 
 class DashboardView extends StatefulWidget {
   const DashboardView({super.key});
@@ -57,14 +58,6 @@ class _DashboardViewState extends State<DashboardView> {
         alumnos.add(result);
       });
     }
-
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Registro exitoso'),
-        backgroundColor: Colors.green,
-      ),
-    );
   }
 
   // --- ALGORITHMIC GROUPING LOGIC ---

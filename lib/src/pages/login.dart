@@ -10,10 +10,9 @@ class FormularioLogin extends StatefulWidget {
 }
 
 class _FormularioLoginState extends State<FormularioLogin> {
-  String? rolElegido;
-
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  String? rolElegido;
 
   @override
   Widget build(BuildContext context) {
@@ -31,10 +30,11 @@ class _FormularioLoginState extends State<FormularioLogin> {
               ),
             ),
             const SizedBox(height: 30),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               child: TextField(
                 keyboardType: TextInputType.emailAddress,
+                controller: _emailController,
                 decoration: InputDecoration(
                   labelText: 'Email o Username',
                   prefixIcon: Icon(Icons.person),
@@ -43,9 +43,10 @@ class _FormularioLoginState extends State<FormularioLogin> {
               ),
             ),
             const SizedBox(height: 30),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               child: TextField(
+                controller: _passwordController,
                 obscureText: true,
                 decoration: InputDecoration(
                   labelText: 'Contraseña',
@@ -119,7 +120,10 @@ class _FormularioLoginState extends State<FormularioLogin> {
                   );
                 }
               },
-              child: const Text('Acceder', style: TextStyle(fontSize: 18)),
+              child: const Text(
+                'Acceder',
+                style: TextStyle(fontSize: 18, color: Color(0xFF0D47A1)),
+              ),
             ),
           ],
         ),

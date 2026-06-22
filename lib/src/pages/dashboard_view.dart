@@ -25,7 +25,7 @@ class _DashboardViewState extends State<DashboardView> {
   Future<void> _cargarAlumnosDesdeJson() async {
     try {
       final String jsonString = await rootBundle.loadString(
-        'assets/data/alumnos.json',
+        'data/alumnos.json',
       );
       final List<dynamic> jsonList = jsonDecode(jsonString);
 

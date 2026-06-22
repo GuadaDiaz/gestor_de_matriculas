@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:mi_app/src/screens/alumno.dart';
-import 'package:mi_app/src/screens/docente.dart';
+import 'package:gestion_de_matriculas/src/pages/alumno.dart';
+import 'package:gestion_de_matriculas/src/pages/docente.dart';
 
 class FormularioLogin extends StatefulWidget {
   const FormularioLogin({super.key});
@@ -10,19 +10,22 @@ class FormularioLogin extends StatefulWidget {
 }
 
 class _FormularioLoginState extends State<FormularioLogin> {
-  // 1. Creamos una variable para "recordar" el rol seleccionado
   String? rolElegido;
 
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: SingleChildScrollView( 
+      child: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Text(
               'Iniciar Sesión',
-              style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.black),
+              style: TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
             ),
             const SizedBox(height: 30),
             const Padding(
@@ -58,13 +61,9 @@ class _FormularioLoginState extends State<FormularioLogin> {
                   border: OutlineInputBorder(),
                 ),
                 items: ['Alumno', 'Docente'].map((String rol) {
-                  return DropdownMenuItem<String>(
-                    value: rol,
-                    child: Text(rol),
-                  );
+                  return DropdownMenuItem<String>(value: rol, child: Text(rol));
                 }).toList(),
                 onChanged: (nuevoRol) {
-                  // 2. Guardamos la selección del usuario en la variable
                   setState(() {
                     rolElegido = nuevoRol;
                   });
@@ -74,24 +73,36 @@ class _FormularioLoginState extends State<FormularioLogin> {
             const SizedBox(height: 30),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 40,
+                  vertical: 15,
+                ),
               ),
               onPressed: () {
-                // 3. Verificamos la variable y navegamos a la pantalla correspondiente
+                // Validación del estado local antes de procesar la lógica de negocio
+                if (rolElegido == null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Por favor, seleccione un rol primero'),
+                    ),
+                  );
+                  return; // Early return para evitar anidar lógica innecesariamente
+                }
+
+                // Mutación destructiva de la pila de navegación
                 if (rolElegido == 'Alumno') {
-                  Navigator.push(
+                  Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) => const PantallaAlumno()),
+                    MaterialPageRoute(
+                      builder: (context) => const PantallaAlumno(),
+                    ),
                   );
                 } else if (rolElegido == 'Docente') {
-                  Navigator.push(
+                  Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) => const PantallaDocente()),
-                  );
-                } else {
-                  // Muestra un cartelito si tocan el botón sin elegir rol
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Por favor, seleccione un rol primero')),
+                    MaterialPageRoute(
+                      builder: (context) => const PantallaDocente(),
+                    ),
                   );
                 }
               },
@@ -103,6 +114,3 @@ class _FormularioLoginState extends State<FormularioLogin> {
     );
   }
 }
-
-
-

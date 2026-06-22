@@ -13,15 +13,8 @@ class HomePage extends StatelessWidget {
       length: 3,
       initialIndex: 0,
       child: Scaffold(
-        backgroundColor: Colors.white,
         appBar: AppBar(
           title: const Text('Gestión Escolar'),
-          titleTextStyle: const TextStyle(
-            color: Colors.white,
-            fontSize: 25,
-            fontWeight: FontWeight.bold,
-          ),
-          backgroundColor: const Color(0xFF0D47A1),
           bottom: const TabBar(
             labelColor: Colors.white,
             unselectedLabelColor: Colors.white54,
@@ -50,7 +43,6 @@ class HomePage extends StatelessWidget {
 
         // --- REDES SOCIALES FIJAS ABAJO ---
         bottomNavigationBar: BottomAppBar(
-          color: const Color(0xFF0D47A1),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [

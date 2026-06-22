@@ -141,9 +141,6 @@ class _RegistrationViewState extends State<RegistrationView> {
             const SizedBox(height: 40),
 
             ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-              ),
               onPressed: _confirmSave,
               child: const Text(
                 'Guardar Registro',

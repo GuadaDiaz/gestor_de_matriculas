@@ -19,8 +19,6 @@ class PantallaDocente extends StatelessWidget {
           ),
         ],
         centerTitle: true,
-        backgroundColor: const Color(0xFF0D47A1),
-        foregroundColor: Colors.white,
       ),
       body: Stack(
         children: [
@@ -59,16 +57,10 @@ class PantallaDocente extends StatelessWidget {
 
                 // Navigation Button 1: Inscribir Alumno
                 ElevatedButton.icon(
-                  icon: const Icon(Icons.person_add, color: Color(0xFF0D47A1)),
+                  icon: const Icon(Icons.person_add),
                   label: const Text(
                     'Inscribir Alumno',
-                    style: TextStyle(fontSize: 16, color: Color(0xFF0D47A1)),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 30,
-                      vertical: 15,
-                    ),
+                    style: TextStyle(fontSize: 16),
                   ),
                   onPressed: () {
                     Navigator.pushNamed(context, '/registro');

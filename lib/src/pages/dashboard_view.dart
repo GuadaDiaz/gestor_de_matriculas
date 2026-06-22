@@ -101,7 +101,7 @@ class _DashboardViewState extends State<DashboardView> {
                   ),
                   elevation: 2,
                   child: ExpansionTile(
-                    leading: const Icon(Icons.class_, color: Color(0xFF0D47A1)),
+                    leading: Icon(Icons.class_, color: Theme.of(context).colorScheme.primary),
                     title: Text(
                       nombreCurso,
                       style: const TextStyle(

@@ -23,7 +23,7 @@ class AlumnoCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                const Icon(Icons.person, color: Color(0xFF0D47A1), size: 40),
+                Icon(Icons.person, color: Theme.of(context).colorScheme.primary, size: 40),
                 const SizedBox(width: 16),
                 Expanded(
                   child: Column(
@@ -53,13 +53,13 @@ class AlumnoCard extends StatelessWidget {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.blue.shade100,
+                    color: Theme.of(context).colorScheme.primaryContainer,
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
                     alumno.curso,
-                    style: const TextStyle(
-                      color: Color(0xFF0D47A1),
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.primary,
                       fontWeight: FontWeight.bold,
                     ),
                   ),

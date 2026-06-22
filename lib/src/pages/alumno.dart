@@ -18,7 +18,6 @@ class PantallaAlumno extends StatelessWidget {
             },
           ),
         ],
-        backgroundColor: Colors.green, // Color distinto para notar el cambio
       ),
       body: const Center(
         child: Text(

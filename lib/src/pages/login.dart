@@ -76,12 +76,6 @@ class _FormularioLoginState extends State<FormularioLogin> {
             ),
             const SizedBox(height: 30),
             ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 40,
-                  vertical: 15,
-                ),
-              ),
               onPressed: () {
                 if (_emailController.text.trim().isEmpty ||
                     _passwordController.text.trim().isEmpty) {
@@ -124,7 +118,7 @@ class _FormularioLoginState extends State<FormularioLogin> {
               },
               child: const Text(
                 'Acceder',
-                style: TextStyle(fontSize: 18, color: Color(0xFF0D47A1)),
+                style: TextStyle(fontSize: 18),
               ),
             ),
           ],

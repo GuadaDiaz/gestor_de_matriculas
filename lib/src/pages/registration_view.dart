@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:gestion_de_matriculas/src/alumno/alumno_model.dart';
+import '../services/alumno_service.dart';
 
 class RegistrationView extends StatefulWidget {
-  const RegistrationView({super.key});
+  // Para editar la carga del alumno
+  final Alumno? alumnoExistente;
+
+  const RegistrationView({super.key, this.alumnoExistente});
 
   @override
   State<RegistrationView> createState() => _RegistrationViewState();
@@ -21,8 +25,24 @@ class _RegistrationViewState extends State<RegistrationView> {
     '5to B',
   ];
   String? _cursoSeleccionado;
+  DateTime? _fechaSeleccionada;
 
-  DateTime? _fechaSeleccionada; // Estado local para la fecha
+  bool _isEditing = false;
+  bool _isLoading = false; // Para evitar cargar múltiples
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.alumnoExistente != null) {
+      _isEditing = true;
+      final alumno = widget.alumnoExistente!;
+
+      _nombreController.text = alumno.nombre;
+      _dniController.text = alumno.dni;
+      _cursoSeleccionado = alumno.curso;
+      _fechaSeleccionada = alumno.fechaNacimiento;
+    }
+  }
 
   @override
   void dispose() {
@@ -32,76 +52,77 @@ class _RegistrationViewState extends State<RegistrationView> {
     super.dispose();
   }
 
-  // Asynchronous interaction with the OS Calendar
   Future<void> _seleccionarFecha(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: DateTime.now().subtract(
-        const Duration(days: 365 * 6),
-      ), // Start 6 years ago
+      initialDate:
+          _fechaSeleccionada ??
+          DateTime.now().subtract(const Duration(days: 365 * 6)),
       firstDate: DateTime(2000),
       lastDate: DateTime.now(),
     );
     if (picked != null && picked != _fechaSeleccionada) {
-      setState(() {
-        _fechaSeleccionada = picked;
-      });
+      setState(() => _fechaSeleccionada = picked);
     }
   }
 
-  Future<void> _confirmSave() async {
-    // Strict validation
-    if (_nombreController.text.isEmpty ||
-        _dniController.text.isEmpty ||
+  Future<void> _procesarFormulario() async {
+    if (_nombreController.text.trim().isEmpty ||
+        _dniController.text.trim().isEmpty ||
         _cursoSeleccionado == null ||
         _fechaSeleccionada == null) {
-      ScaffoldMessenger.of(context).clearSnackBars();    
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Por favor, complete todos los campos obligatorios.'),
+          content: Text('Completar todos los campos es obligatorio.'),
         ),
       );
       return;
     }
 
-    final confirmar = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Confirmar Inscripción'),
-        content: Text('¿Desea inscribir a ${_nombreController.text}?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancelar'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Confirmar'),
-          ),
-        ],
-      ),
-    );
-    if (confirmar != true) return;
+    setState(() => _isLoading = true);
 
-    // Validación obligatoria de Flutter después de un 'await'
-    if (!mounted) return;
+    try {
+      if (_isEditing) {
+        // UPDATE
+        final alumnoActualizado = Alumno(
+          id: widget.alumnoExistente!.id, // Preserve the Firestore Document ID
+          nombre: _nombreController.text.trim(),
+          dni: _dniController.text.trim(),
+          curso: _cursoSeleccionado!,
+          fechaNacimiento: _fechaSeleccionada!,
+        );
+        await AlumnoService.instance.actualizarAlumno(alumnoActualizado);
+      } else {
+        // CREATE
+        final nuevoAlumno = Alumno(
+          nombre: _nombreController.text.trim(),
+          dni: _dniController.text.trim(),
+          curso: _cursoSeleccionado!,
+          fechaNacimiento: _fechaSeleccionada!,
+        );
+        await AlumnoService.instance.registrarAlumno(nuevoAlumno);
+      }
 
-    final nuevoAlumno = Alumno(
-      nombre: _nombreController.text,
-      dni: _dniController.text,
-      curso: _cursoSeleccionado!,
-      fechaNacimiento: _fechaSeleccionada!,
-    );
-
-    Navigator.pop(context, nuevoAlumno);
+      // Vuelve a la página anterior
+      if (mounted) Navigator.pop(context);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error de red: $e')));
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Nueva Inscripción')),
+      appBar: AppBar(
+        title: Text(_isEditing ? 'Editar Matrícula' : 'Nueva Inscripción'),
+      ),
       body: SingleChildScrollView(
-        // Changed to ScrollView to avoid keyboard overflow
         padding: const EdgeInsets.all(24.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -110,31 +131,36 @@ class _RegistrationViewState extends State<RegistrationView> {
               controller: _nombreController,
               decoration: const InputDecoration(
                 labelText: 'Nombre Completo',
-                prefixIcon: Icon(Icons.person),
                 border: OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: 20),
-
-            // DNI Input
             TextField(
               controller: _dniController,
               keyboardType: TextInputType.number,
               decoration: const InputDecoration(
                 labelText: 'DNI',
-                prefixIcon: Icon(Icons.badge),
                 border: OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: 20),
-
-            // DatePicker
+            DropdownMenu<String>(
+              controller: _cursoController,
+              label: const Text('Seleccionar Curso'),
+              width: MediaQuery.of(context).size.width - 48,
+              initialSelection: _cursoSeleccionado,
+              dropdownMenuEntries: _cursosDisponibles.map((String curso) {
+                return DropdownMenuEntry<String>(value: curso, label: curso);
+              }).toList(),
+              onSelected: (String? newValue) =>
+                  setState(() => _cursoSeleccionado = newValue),
+            ),
+            const SizedBox(height: 20),
             InkWell(
               onTap: () => _seleccionarFecha(context),
               child: InputDecorator(
                 decoration: const InputDecoration(
                   labelText: 'Fecha de Nacimiento',
-                  prefixIcon: Icon(Icons.calendar_today),
                   border: OutlineInputBorder(),
                 ),
                 child: Row(
@@ -145,32 +171,24 @@ class _RegistrationViewState extends State<RegistrationView> {
                           ? 'Seleccione una fecha'
                           : "${_fechaSeleccionada!.day}/${_fechaSeleccionada!.month}/${_fechaSeleccionada!.year}",
                     ),
+                    const Icon(Icons.calendar_today),
                   ],
                 ),
               ),
             ),
-            const SizedBox(height: 20),
-
-            DropdownMenu<String>(
-              controller: _cursoController,
-              label: const Text('Seleccionar Curso'),
-              width: MediaQuery.of(context).size.width - 48,
-              dropdownMenuEntries: _cursosDisponibles.map((String curso) {
-                return DropdownMenuEntry<String>(value: curso, label: curso);
-              }).toList(),
-              onSelected: (String? newValue) {
-                setState(() {
-                  _cursoSeleccionado = newValue;
-                });
-              },
-            ),
             const SizedBox(height: 40),
-
-            ElevatedButton(
-              onPressed: _confirmSave,
-              child: const Text(
-                'Guardar Registro',
-                style: TextStyle(fontSize: 18),
+            SizedBox(
+              height: 50,
+              child: ElevatedButton(
+                onPressed: _isLoading ? null : _procesarFormulario,
+                child: _isLoading
+                    ? const CircularProgressIndicator(color: Colors.white)
+                    : Text(
+                        _isEditing
+                            ? 'Actualizar Matrícula'
+                            : 'Guardar Registro',
+                        style: const TextStyle(fontSize: 18),
+                      ),
               ),
             ),
           ],

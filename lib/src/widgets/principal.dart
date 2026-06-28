@@ -9,16 +9,14 @@ class Principal extends StatefulWidget {
 }
 
 class _PrincipalState extends State<Principal> {
-
   final PageController _pageController = PageController();
   Timer? _timer;
   int _currentPage = 0;
 
-  
   final List<String> _imagenes = [
     'assets/ECLGSM_frente.jpg',
-    'assets/industriaal.jpg', 
-    'assets/EscDec.jpg', // 
+    'assets/industriaal.jpg',
+    'assets/EscDec.jpg', //
   ];
 
   @override
@@ -29,7 +27,7 @@ class _PrincipalState extends State<Principal> {
       if (_currentPage < _imagenes.length - 1) {
         _currentPage++;
       } else {
-        _currentPage = 0; 
+        _currentPage = 0;
       }
 
       _pageController.animateToPage(
@@ -63,14 +61,11 @@ class _PrincipalState extends State<Principal> {
               });
             },
             itemBuilder: (context, index) {
-              return Image.asset(
-                _imagenes[index],
-                fit: BoxFit.cover,
-              );
+              return Image.asset(_imagenes[index], fit: BoxFit.cover);
             },
           ),
         ),
-    
+
         Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
@@ -83,7 +78,7 @@ class _PrincipalState extends State<Principal> {
             ),
           ),
         ),
-        
+
         Align(
           alignment: Alignment.bottomCenter,
           child: Padding(
@@ -109,7 +104,8 @@ class _PrincipalState extends State<Principal> {
                   ),
                 ),
                 const SizedBox(height: 8),
-                Text('UNSJ — Sistema de Gestión Escolar',
+                Text(
+                  'UNSJ — Sistema de Gestión Escolar',
                   style: TextStyle(color: Colors.white70, fontSize: 16),
                 ),
                 const SizedBox(height: 8),
@@ -122,7 +118,9 @@ class _PrincipalState extends State<Principal> {
                       width: _currentPage == index ? 24 : 8,
                       height: 8,
                       decoration: BoxDecoration(
-                        color: _currentPage == index ? Colors.white : Colors.white54,
+                        color: _currentPage == index
+                            ? Colors.white
+                            : Colors.white54,
                         borderRadius: BorderRadius.circular(4),
                       ),
                     );

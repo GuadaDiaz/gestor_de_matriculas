@@ -4,6 +4,7 @@ import 'package:gestion_de_matriculas/src/app.dart';
 import 'package:gestion_de_matriculas/src/services/firebase_options.dart';
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   runApp(const MainApp());

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:gestion_de_matriculas/src/pages/alumno.dart';
 import 'package:gestion_de_matriculas/src/pages/docente.dart';
@@ -15,6 +16,7 @@ class _FormularioLoginState extends State<FormularioLogin> {
   String? rolElegido;
 
   bool _obscurePassword = true;
+  bool _isLoading = false; // Evita toques dobles al procesar
 
   // Se ejecuta automáticamente antes de destruir la pantalla para liberar memoria.
   @override
@@ -96,50 +98,98 @@ class _FormularioLoginState extends State<FormularioLogin> {
             ),
             const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () {
-                if (_emailController.text.trim().isEmpty ||
-                    _passwordController.text.trim().isEmpty) {
-                  ScaffoldMessenger.of(context).clearSnackBars();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Error: Credenciales incompletas.'),
-                    ),
-                  );
-                  return; // Early return, corta la ejecución
-                }
+              onPressed: _isLoading
+                  ? null
+                  : () async {
+                      if (_emailController.text.trim().isEmpty ||
+                          _passwordController.text.trim().isEmpty) {
+                        ScaffoldMessenger.of(context).clearSnackBars();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Error: Credenciales incompletas.'),
+                          ),
+                        );
+                        return; // Early return, corta la ejecución
+                      }
 
-                // Validación del estado local antes de procesar la lógica de negocio
-                if (rolElegido == null) {
-                  ScaffoldMessenger.of(context).clearSnackBars();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Por favor, seleccione un rol primero'),
-                    ),
-                  );
-                  return; // Early return para evitar anidar lógica innecesariamente
-                }
+                      // Validación del estado local antes de procesar la lógica de negocio
+                      if (rolElegido == null) {
+                        ScaffoldMessenger.of(context).clearSnackBars();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Por favor, seleccione un rol primero'),
+                          ),
+                        );
+                        return; // Early return para evitar anidar lógica innecesariamente
+                      }
 
-                // Mutación destructiva de la pila de navegación
-                if (rolElegido == 'Alumno') {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const PantallaAlumno(),
+                      if (rolElegido == 'Alumno') {
+                        // TODO: Cuando el login real con Firebase Auth esté listo,
+                        // reemplazar este bloque por el uid del usuario autenticado.
+                        // Por ahora usamos el primer alumno de la colección como demo.
+                        setState(() => _isLoading = true);
+
+                        // Capturamos messenger y navigator ANTES del await
+                        // para no usar BuildContext cruzando un gap asíncrono
+                        final messenger = ScaffoldMessenger.of(context);
+                        final navigator = Navigator.of(context);
+
+                        try {
+                          final snapshot = await FirebaseFirestore.instance
+                              .collection('alumnos')
+                              .limit(1)
+                              .get();
+
+                          if (!mounted) return;
+
+                          if (snapshot.docs.isEmpty) {
+                            messenger.showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                    'No hay alumnos registrados aún. Pedile al docente que te inscriba primero.'),
+                              ),
+                            );
+                            return;
+                          }
+
+                          // Mutación destructiva de la pila de navegación
+                          navigator.pushReplacement(
+                            MaterialPageRoute(
+                              builder: (context) => PantallaAlumno(
+                                alumnoId: snapshot.docs.first.id,
+                              ),
+                            ),
+                          );
+                        } catch (e) {
+                          if (mounted) {
+                            messenger.showSnackBar(
+                              SnackBar(content: Text('Error de conexión: $e')),
+                            );
+                          }
+                        } finally {
+                          if (mounted) setState(() => _isLoading = false);
+                        }
+                      } else if (rolElegido == 'Docente') {
+                        // Mutación destructiva de la pila de navegación
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const PantallaDocente(),
+                          ),
+                        );
+                      }
+                    },
+              child: _isLoading
+                  ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                          color: Colors.white, strokeWidth: 2),
+                    )
+                  : const Text(
+                      'Acceder',
+                      style: TextStyle(fontSize: 18),
                     ),
-                  );
-                } else if (rolElegido == 'Docente') {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const PantallaDocente(),
-                    ),
-                  );
-                }
-              },
-              child: const Text(
-                'Acceder',
-                style: TextStyle(fontSize: 18),
-              ),
             ),
           ],
         ),

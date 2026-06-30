@@ -14,13 +14,20 @@ class AlumnoService {
     await _firestore.collection(_coleccion).add(alumno.toMap());
   }
 
-  // READ
+  // READ — Stream de todos los alumnos (para el dashboard del docente)
   Stream<List<Alumno>> getAlumnosStream() {
     return _firestore.collection(_coleccion).snapshots().map((snapshot) {
       return snapshot.docs.map((doc) {
         return Alumno.fromMap(doc.data(), doc.id);
       }).toList();
     });
+  }
+
+  // READ — Obtiene un alumno específico por su ID (para la pantalla de perfil)
+  Future<Alumno?> getAlumnoPorId(String id) async {
+    final doc = await _firestore.collection(_coleccion).doc(id).get();
+    if (!doc.exists) return null;
+    return Alumno.fromMap(doc.data()!, doc.id);
   }
 
   // UPDATE

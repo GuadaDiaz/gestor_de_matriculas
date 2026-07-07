@@ -26,16 +26,14 @@ class _FormularioLoginState extends State<FormularioLogin> {
     _passwordController.dispose();
     super.dispose();
   }
-  
+
   Future<void> _iniciarSesionConQR() async {
     final String? qrData = await Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => const QRLoginScanner(), 
-      ),
+      MaterialPageRoute(builder: (context) => const QRLoginScanner()),
     );
 
-    if (!mounted) return; 
+    if (!mounted) return;
 
     if (qrData != null) {
       String datosLeidos = qrData.toLowerCase();
@@ -57,7 +55,9 @@ class _FormularioLoginState extends State<FormularioLogin> {
           if (snapshot.docs.isEmpty) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('No hay alumnos registrados en la base de datos.'),
+                content: Text(
+                  'No hay alumnos registrados en la base de datos.',
+                ),
               ),
             );
             return;
@@ -72,26 +72,20 @@ class _FormularioLoginState extends State<FormularioLogin> {
               ),
             ),
           );
-
         } catch (e) {
           if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Error de conexión: $e')),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text('Error de conexión: $e')));
           }
         } finally {
           if (mounted) setState(() => _isLoading = false);
         }
-        
       } else if (datosLeidos.contains('docente')) {
-        
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(
-            builder: (context) => const PantallaDocente(),
-          ),
+          MaterialPageRoute(builder: (context) => const PantallaDocente()),
         );
-        
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -147,8 +141,13 @@ class _FormularioLoginState extends State<FormularioLogin> {
                   labelText: 'Contraseña',
                   prefixIcon: const Icon(Icons.lock),
                   suffixIcon: IconButton(
-                    icon: Icon(_obscurePassword ? Icons.visibility : Icons.visibility_off),
-                    onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                    icon: Icon(
+                      _obscurePassword
+                          ? Icons.visibility
+                          : Icons.visibility_off,
+                    ),
+                    onPressed: () =>
+                        setState(() => _obscurePassword = !_obscurePassword),
                   ),
                   border: const OutlineInputBorder(),
                 ),
@@ -174,7 +173,7 @@ class _FormularioLoginState extends State<FormularioLogin> {
               ),
             ),
             const SizedBox(height: 30),
-            
+
             // --- BOTÓN NORMAL (CON CORREO Y CONTRASEÑA) ---
             ElevatedButton(
               onPressed: _isLoading
@@ -188,7 +187,7 @@ class _FormularioLoginState extends State<FormularioLogin> {
                             content: Text('Error: Credenciales incompletas.'),
                           ),
                         );
-                        return; // Early return, corta la ejecución
+                        return;
                       }
 
                       // Validación del estado local antes de procesar la lógica de negocio
@@ -196,20 +195,17 @@ class _FormularioLoginState extends State<FormularioLogin> {
                         ScaffoldMessenger.of(context).clearSnackBars();
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                            content: Text('Por favor, seleccione un rol primero'),
+                            content: Text(
+                              'Por favor, seleccione un rol primero',
+                            ),
                           ),
                         );
-                        return; // Early return para evitar anidar lógica innecesariamente
+                        return;
                       }
 
                       if (rolElegido == 'Alumno') {
-                        // TODO: Cuando el login real con Firebase Auth esté listo,
-                        // reemplazar este bloque por el uid del usuario autenticado.
-                        // Por ahora usamos el primer alumno de la colección como demo.
                         setState(() => _isLoading = true);
 
-                        // Capturamos messenger y navigator ANTES del await
-                        // para no usar BuildContext cruzando un gap asíncrono
                         final messenger = ScaffoldMessenger.of(context);
                         final navigator = Navigator.of(context);
 
@@ -225,7 +221,8 @@ class _FormularioLoginState extends State<FormularioLogin> {
                             messenger.showSnackBar(
                               const SnackBar(
                                 content: Text(
-                                    'No hay alumnos registrados aún. Pedile al docente que te inscriba primero.'),
+                                  'No hay alumnos registrados aún. Pedile al docente que te inscriba primero.',
+                                ),
                               ),
                             );
                             return;
@@ -263,29 +260,31 @@ class _FormularioLoginState extends State<FormularioLogin> {
                       height: 20,
                       width: 20,
                       child: CircularProgressIndicator(
-                          color: Colors.white, strokeWidth: 2),
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
                     )
                   : const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                      child: Text(
-                        'Acceder',
-                        style: TextStyle(fontSize: 18),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 10,
                       ),
+                      child: Text('Acceder', style: TextStyle(fontSize: 18)),
                     ),
             ),
-            
+
             const SizedBox(height: 15),
 
-            // --- BOTÓN QR QUE FALTABA EN TU CÓDIGO ---
+            // --- BOTÓN QR
             OutlinedButton.icon(
-              onPressed: _iniciarSesionConQR, 
+              onPressed: _iniciarSesionConQR,
               icon: const Icon(Icons.qr_code_scanner, size: 24),
               label: const Padding(
                 padding: EdgeInsets.symmetric(vertical: 10),
                 child: Text('Entrar con QR', style: TextStyle(fontSize: 16)),
               ),
             ),
-            
+
             const SizedBox(height: 20),
           ],
         ),
